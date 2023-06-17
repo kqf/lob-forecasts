@@ -1,0 +1,19 @@
+from pathlib import Path
+
+import numpy as np
+
+
+def build_data(
+    data=Path("data/"),
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    dec_data = np.loadtxt(data / "Train_Dst_NoAuction_DecPre_CF_7.txt")
+    dec_train = dec_data[:, : int(np.floor(dec_data.shape[1] * 0.8))]
+    dec_val = dec_data[:, int(np.floor(dec_data.shape[1] * 0.8)) :]
+
+    dec_test1 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_7.txt")
+    dec_test2 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_8.txt")
+    dec_test3 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_9.txt")
+    dec_test = np.hstack((dec_test1, dec_test2, dec_test3))
+
+    print(dec_train.shape, dec_val.shape, dec_test.shape)
+    return dec_train, dec_val, dec_test

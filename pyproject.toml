@@ -1,0 +1,12 @@
+[project]
+name = "lob-forecasts"
+version = "0.0.1"
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true

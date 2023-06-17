@@ -1,0 +1,19 @@
+# Data
+*.txt
+*.csv
+*.zip
+
+# Tools
+.git/
+.idea/
+**/__pycache__/
+.vscode/
+.mypy_cache/
+.DS_Store
+.python-version
+*.egg*
+.coverage
+.env
+
+# Include
+!requirements.txt
