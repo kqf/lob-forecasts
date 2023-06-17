@@ -34,11 +34,9 @@ def data_classification(X, Y, T):
     df = np.array(X)
     dY = np.array(Y)
     dataY = dY[T - 1 : N]
-
     dataX = np.zeros((N - T + 1, T, D))
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
-
     return dataX, dataY
 
 
