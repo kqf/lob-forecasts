@@ -2,6 +2,7 @@ import numpy as np
 import skorch
 import torch
 from matplotlib import pyplot as plt
+from sklearn.metrics import accuracy_score, classification_report
 
 from forecasts.data import LobDataset, build_data
 from forecasts.model import DeepLob
@@ -26,8 +27,7 @@ def main():
     train, valid, test_ = build_data()
     dataset_train = LobDataset(data=train[:, :200])
     dataset_valid = LobDataset(data=valid[:, :200])
-    print(len(dataset_train))
-    # dataset_test_ = LobDataset(data=test_)
+    dataset_test_ = LobDataset(data=test_[:, :200])
     model = skorch.NeuralNetClassifier(
         module=DeepLob,
         module__num_classes=3,
@@ -37,7 +37,7 @@ def main():
         optimizer__lr=0.0001,
         batch_size=batch_size,
         iterator_train__shuffle=True,
-        max_epochs=20,
+        max_epochs=2,
         device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         callbacks=[
             skorch.callbacks.ProgressBar(),
@@ -45,6 +45,10 @@ def main():
         ],
     )
     model.fit(dataset_train, None)
+    y_pred = model.predict(dataset_test_)
+    print()
+    print("accuracy_score:", accuracy_score(dataset_test_.y, y_pred))
+    print(classification_report(dataset_test_.y, y_pred, digits=4))
 
 
 if __name__ == "__main__":
