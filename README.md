@@ -9,7 +9,7 @@ pip install -r requirements.txt
 pip isntall -e .
 ```
 
-# Run
+## Run
 To start training and evaluation do the following:
 ```bash
 make

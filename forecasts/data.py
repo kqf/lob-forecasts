@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import numpy as np
-import torch
 
 
 def build_data(
@@ -20,7 +19,7 @@ def build_data(
     return dec_train, dec_val, dec_test
 
 
-def data_classification(
+def to_classification(
     data: np.ndarray,
     T: int = 100,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -36,14 +35,3 @@ def data_classification(
         dataX[i - T] = df[i - T : i, :]
     x, y = dataX[:, None], dataY[:, -1] - 1
     return x.astype(np.float32), y.astype(np.int64)
-
-
-class LobDataset(torch.utils.data.Dataset):
-    def __init__(self, data: np.ndarray, T: int = 100):
-        self.x, self.y = data_classification(data, T)
-
-    def __len__(self) -> int:
-        return len(self.x)
-
-    def __getitem__(self, index: int) -> tuple[np.ndarray, np.ndarray]:
-        return self.x[index], self.y[index]

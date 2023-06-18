@@ -1,44 +1,32 @@
-import torch
+from functools import partial
 
-from forecasts.data import LobDataset, build_data
-from forecasts.model import DeepLob, batch_gd, evaluate
+import skorch
+from sklearn.metrics import accuracy_score, classification_report
+
+from forecasts.data import build_data, to_classification
+from forecasts.model import build_model
+
+
+def train_split(X, y, X_valid, y_valid):
+    return X, skorch.dataset.Dataset(X=X_valid, y=y_valid)
 
 
 def main():
-    batch_size = 64
     train, valid, test_ = build_data()
-    dataset_train = LobDataset(data=train)
-    dataset_valid = LobDataset(data=valid)
-    dataset_test_ = LobDataset(data=test_)
+    X_train, y_train = to_classification(data=train)
+    X_valid, y_valid = to_classification(data=valid)
+    X_test_, y_test_ = to_classification(data=test_)
 
-    train_loader = torch.utils.data.DataLoader(
-        dataset=dataset_train,
-        batch_size=batch_size,
-        shuffle=True,
+    model = build_model(
+        num_classes=3,
+        batch_size=64,
+        train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
     )
-    valid_loader = torch.utils.data.DataLoader(
-        dataset=dataset_valid,
-        batch_size=batch_size,
-        shuffle=False,
-    )
-    test__loader = torch.utils.data.DataLoader(
-        dataset=dataset_test_,
-        batch_size=batch_size,
-        shuffle=False,
-    )
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = DeepLob(num_classes=3)
-    batch_gd(
-        model,
-        torch.nn.CrossEntropyLoss(),
-        torch.optim.Adam(model.parameters(), lr=0.0001),
-        train_loader,
-        valid_loader,
-        epochs=50,
-        device=device,
-    )
-    model = torch.load("best_val_model_pytorch")
-    evaluate(model, test__loader, device)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test_)
+    print()
+    print("accuracy_score:", accuracy_score(y_test_, y_pred))
+    print(classification_report(y_test_, y_pred, digits=4))
 
 
 if __name__ == "__main__":
