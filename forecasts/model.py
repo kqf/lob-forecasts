@@ -3,6 +3,8 @@ from datetime import datetime
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
+from sklearn.base import accuracy_score
+from sklearn.metrics import classification_report
 from tqdm import tqdm
 
 
@@ -243,3 +245,30 @@ def batch_gd(
     plt.legend()
     plt.savefig("learning-curve.png")
     return train_losses, test_losses
+
+
+def evaluate(model, test_loader, device):
+    # model = torch.load('best_val_model_pytorch')
+    all_targets = []
+    all_predictions = []
+
+    for inputs, targets in test_loader:
+        # Move to GPU
+        inputs, targets = inputs.to(device, dtype=torch.float), targets.to(
+            device, dtype=torch.int64
+        )
+
+        # Forward pass
+        outputs = model(inputs)
+
+        # Get prediction
+        # torch.max returns both max and argmax
+        _, predictions = torch.max(outputs, 1)
+
+        all_targets.append(targets.cpu().numpy())
+        all_predictions.append(predictions.cpu().numpy())
+
+    all_targets = np.concatenate(all_targets)
+    all_predictions = np.concatenate(all_predictions)
+    print("accuracy_score:", accuracy_score(all_targets, all_predictions))
+    print(classification_report(all_targets, all_predictions, digits=4))
