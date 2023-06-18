@@ -2,6 +2,7 @@ from datetime import datetime
 
 import numpy as np
 import torch
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 
@@ -236,4 +237,9 @@ def batch_gd(
             f"Best Val Epoch: {best_test_epoch}"
         )
 
+    plt.figure(figsize=(15, 6))
+    plt.plot(train_losses, label="train loss")
+    plt.plot(test_losses, label="validation loss")
+    plt.legend()
+    plt.savefig("learning-curve.png")
     return train_losses, test_losses
