@@ -5,8 +5,8 @@ from forecasts.model import DeepLob
 
 
 @pytest.fixture
-def batch(device):
-    return torch.ones((64, 1, 100, 40), device=device)
+def batch(device, batch_size):
+    return torch.ones((batch_size, 1, 100, 40), device=device)
 
 
 @pytest.mark.parametrize(
@@ -16,6 +16,14 @@ def batch(device):
         # torch.device("cuda"),
     ],
 )
-def test_model(batch):
-    model = DeepLob(y_len=3)
-    assert model(batch).shape == (64, 3)
+@pytest.mark.parametrize(
+    "batch_size",
+    [
+        16,
+        32,
+        64,
+    ],
+)
+def test_model(batch, device, batch_size):
+    model = DeepLob(y_len=3).to(device)
+    assert model(batch).shape == (batch_size, 3)
