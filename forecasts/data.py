@@ -20,7 +20,7 @@ def build_data(
     return dec_train, dec_val, dec_test
 
 
-def data_classification(
+def to_classification(
     data: np.ndarray,
     T: int = 100,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -40,7 +40,7 @@ def data_classification(
 
 class LobDataset(torch.utils.data.Dataset):
     def __init__(self, data: np.ndarray, T: int = 100):
-        self.x, self.y = data_classification(data, T)
+        self.x, self.y = to_classification(data, T)
 
     def __len__(self) -> int:
         return len(self.x)
