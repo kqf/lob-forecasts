@@ -35,6 +35,7 @@ def main():
         train_loader,
         valid_loader,
         epochs=50,
+        device=device,
     )
     model = torch.load("best_val_model_pytorch")
     evaluate(model, test__loader, device)

@@ -1,4 +1,4 @@
-all:
+all: data
 	python forecasts/main.py
 
 data:

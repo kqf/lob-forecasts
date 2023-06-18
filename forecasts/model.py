@@ -183,7 +183,7 @@ def batch_gd(
     test_losses = np.zeros(epochs)
     best_test_loss = np.inf
     best_test_epoch = 0
-
+    model = model.to(device)
     for it in tqdm(range(epochs)):
         model.train()
         t0 = datetime.now()
