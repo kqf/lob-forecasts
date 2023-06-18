@@ -18,7 +18,7 @@ class PlotLossCallback(skorch.callbacks.Callback):
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
         plt.legend()
-        plt.show()
+        plt.savefig("learning-curve.png")
 
 
 def main():
