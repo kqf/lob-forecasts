@@ -8,9 +8,9 @@ from forecasts.model import DeepLob
 def main():
     batch_size = 64 * 6
     train, valid, test_ = build_data()
-    dataset_train = LobDataset(data=train, k=4, num_classes=3, T=100)
-    dataset_valid = LobDataset(data=valid, k=4, num_classes=3, T=100)
-    # dataset_test_ = LobDataset(data=test_, k=4, num_classes=3, T=100)
+    dataset_train = LobDataset(data=train)
+    dataset_valid = LobDataset(data=valid)
+    # dataset_test_ = LobDataset(data=test_)
     model = DeepLob(y_len=dataset_train.num_classes)
     model = skorch.NeuralNetClassifier(
         module=DeepLob,

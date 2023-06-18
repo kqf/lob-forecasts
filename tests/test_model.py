@@ -25,5 +25,5 @@ def batch(device, batch_size):
     ],
 )
 def test_model(batch, device, batch_size):
-    model = DeepLob(y_len=3).to(device)
+    model = DeepLob(num_classes=3).to(device)
     assert model(batch).shape == (batch_size, 3)
