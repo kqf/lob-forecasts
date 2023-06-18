@@ -26,12 +26,9 @@ def main():
         batch_size=batch_size,
         shuffle=False,
     )
-    for x, y in train_loader:
-        print(x.shape, y.shape)
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = DeepLob()
-    train_losses, val_losses = batch_gd(
+    model = DeepLob(y_len=dataset_train.num_classes)
+    batch_gd(
         model,
         torch.nn.CrossEntropyLoss(),
         torch.optim.Adam(model.parameters(), lr=0.0001),

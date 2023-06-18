@@ -3,8 +3,7 @@ from datetime import datetime
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
-from sklearn.base import accuracy_score
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
 
 
@@ -248,7 +247,6 @@ def batch_gd(
 
 
 def evaluate(model, test_loader, device):
-    # model = torch.load('best_val_model_pytorch')
     all_targets = []
     all_predictions = []
 
