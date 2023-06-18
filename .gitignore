@@ -14,6 +14,8 @@
 *.egg*
 .coverage
 .env
+best_val_model_pytorch
+*.png
 
 # Include
 !requirements.txt
