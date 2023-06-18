@@ -145,10 +145,6 @@ class DeepLob(torch.nn.Module):
         self.fc1 = torch.nn.Linear(64, self.num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # h0: (number of hidden layers, batch size, hidden size)
-        h0 = torch.zeros(1, x.size(0), 64).to(x.device)
-        c0 = torch.zeros(1, x.size(0), 64).to(x.device)
-
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -163,10 +159,10 @@ class DeepLob(torch.nn.Module):
         x = x.permute(0, 2, 1, 3)
         x = torch.reshape(x, (-1, x.shape[1], x.shape[2]))
 
-        x, _ = self.lstm(x, (h0, c0))
+        x, _ = self.lstm(x)
         x = x[:, -1, :]
         x = self.fc1(x)
-        return torch.softmax(x, dim=1)
+        return x
 
 
 class PlotLossCallback(skorch.callbacks.Callback):
@@ -197,7 +193,7 @@ def build_model(
         optimizer__lr=0.0001,
         batch_size=batch_size,
         iterator_train__shuffle=True,
-        max_epochs=2,
+        max_epochs=15,
         device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         callbacks=[
             skorch.callbacks.ProgressBar(),

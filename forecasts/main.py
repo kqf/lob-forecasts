@@ -13,9 +13,9 @@ def train_split(X, y, X_valid, y_valid):
 
 def main():
     train, valid, test_ = build_data()
-    X_train, y_train = to_classification(data=train[:, :200])
-    X_valid, y_valid = to_classification(data=valid[:, :200])
-    X_test_, y_test_ = to_classification(data=test_[:, :200])
+    X_train, y_train = to_classification(data=train)
+    X_valid, y_valid = to_classification(data=valid)
+    X_test_, y_test_ = to_classification(data=test_)
 
     model = build_model(
         num_classes=3,
