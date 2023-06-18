@@ -20,47 +20,29 @@ def build_data(
     return dec_train, dec_val, dec_test
 
 
-def prepare_x(data):
-    df1 = data[:40, :].T
-    return np.array(df1)
+def data_classification(
+    data: np.ndarray,
+    T: int = 100,
+) -> tuple[np.ndarray, np.ndarray]:
+    # Select relevant columns
+    df = np.array(data[:40, :].T)
+    dY = np.array(data[-5:, :].T)
 
-
-def prepare_label(data):
-    return data[-5:, :].T
-
-
-def data_classification(X, Y, T):
-    [N, D] = X.shape
-    df = np.array(X)
-    dY = np.array(Y)
+    # Form the lag-features
+    N, D = df.shape
     dataY = dY[T - 1 : N]
     dataX = np.zeros((N - T + 1, T, D))
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
-    return dataX, dataY
+    return dataX[:, None], dataY[:, -1] - 1
 
 
 class LobDataset(torch.utils.data.Dataset):
-    def __init__(self, data, k, num_classes, T):
-        """Initialization"""
-        self.k = k
-        self.num_classes = num_classes
-        self.T = T
+    def __init__(self, data: np.ndarray, T: int = 100):
+        self.x, self.y = data_classification(data, T)
 
-        x = prepare_x(data)
-        y = prepare_label(data)
-        x, y = data_classification(x, y, self.T)
-        y = y[:, self.k] - 1
-        self.length = len(x)
+    def __len__(self) -> int:
+        return len(self.x)
 
-        x = torch.from_numpy(x)
-        self.x = torch.unsqueeze(x, 1)
-        self.y = torch.from_numpy(y)
-
-    def __len__(self):
-        """Denotes the total number of samples"""
-        return self.length
-
-    def __getitem__(self, index):
-        """Generates samples of data"""
+    def __getitem__(self, index: int) -> tuple[np.ndarray, np.ndarray]:
         return self.x[index], self.y[index]

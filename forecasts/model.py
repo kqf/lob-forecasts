@@ -8,9 +8,9 @@ from tqdm import tqdm
 
 
 class DeepLob(torch.nn.Module):
-    def __init__(self, y_len):
+    def __init__(self, num_classes):
         super().__init__()
-        self.y_len = y_len
+        self.num_classes = num_classes
 
         # convolution blocks
         self.conv1 = torch.nn.Sequential(
@@ -143,7 +143,7 @@ class DeepLob(torch.nn.Module):
         self.lstm = torch.nn.LSTM(
             input_size=192, hidden_size=64, num_layers=1, batch_first=True
         )
-        self.fc1 = torch.nn.Linear(64, self.y_len)
+        self.fc1 = torch.nn.Linear(64, self.num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # h0: (number of hidden layers, batch size, hidden size)
