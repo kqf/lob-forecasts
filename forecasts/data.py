@@ -53,9 +53,8 @@ class LobDataset(torch.utils.data.Dataset):
         y = y[:, self.k] - 1
         self.length = len(x)
 
-        x = torch.from_numpy(x)
-        self.x = torch.unsqueeze(x, 1)
-        self.y = torch.from_numpy(y)
+        self.x = x[:, None].astype(np.float32)
+        self.y = y.astype(np.int64)
 
     def __len__(self):
         """Denotes the total number of samples"""
