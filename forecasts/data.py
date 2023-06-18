@@ -34,7 +34,8 @@ def data_classification(
     dataX = np.zeros((N - T + 1, T, D))
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
-    return dataX[:, None], dataY[:, -1] - 1
+    x, y = dataX[:, None], dataY[:, -1] - 1
+    return x.astype(np.float32), y.astype(np.int64)
 
 
 class LobDataset(torch.utils.data.Dataset):
@@ -45,4 +46,4 @@ class LobDataset(torch.utils.data.Dataset):
         return len(self.x)
 
     def __getitem__(self, index: int) -> tuple[np.ndarray, np.ndarray]:
-        return self.x[index].astype(np.float32), self.y[index].astype(np.int64)
+        return self.x[index], self.y[index]
