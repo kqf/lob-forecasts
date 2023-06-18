@@ -45,4 +45,4 @@ class LobDataset(torch.utils.data.Dataset):
         return len(self.x)
 
     def __getitem__(self, index: int) -> tuple[np.ndarray, np.ndarray]:
-        return self.x[index], self.y[index]
+        return self.x[index].astype(np.float32), self.y[index].astype(np.int64)
