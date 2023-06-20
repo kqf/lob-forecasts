@@ -201,5 +201,8 @@ def build_model(
         callbacks=[
             skorch.callbacks.ProgressBar(),
             PlotLossCallback(),
+            skorch.callbacks.Checkpoint(
+                f_params="best.pt",
+            ),
         ],
     )
