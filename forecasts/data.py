@@ -1,4 +1,6 @@
+from functools import partial
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -72,10 +74,47 @@ FEATURES = [
     "V_a4",
     "P_b4",
     "V_b4",
+    "P_a5",
+    "V_a5",
+    "P_b5",
+    "V_b5",
 ]
 
 
-def read_single(path):
+LABEL_MAPPING = {
+    "up": 0,
+    "down": 1,
+    "stationary": 2,
+}
+
+
+def label(l_t: float, alpha: float) -> str:
+    if l_t > alpha:
+        return "up"
+    if l_t < -alpha:
+        return "down"
+    return "stationary"
+
+
+def files(
+    subset: Literal["train"] | Literal["valid"] | Literal["test"] = "train",
+    directory: str = "data/EURUSD/",
+    n_valid: int = 5,
+    n_test: int = 1,
+):
+    path = Path(directory)
+    # Sort the files by date
+    files = sorted(path.glob("*.csv"), key=lambda x: x.stem.split("_")[1])
+    sets = {
+        "train": files[: -n_valid - n_test],
+        "valid": files[-n_valid - n_test : -n_valid],
+        "test": files[-n_valid:],
+    }
+    for file in tqdm.tqdm(sets[subset]):
+        yield file
+
+
+def read_single(path, horizon: int = 10, alpha=0.000015):
     usecols = [c for c in COLUMNS[2:] if not c.startswith("exclude")]
     df = pd.read_csv(
         path,
@@ -85,56 +124,45 @@ def read_single(path):
         low_memory=True,
     )
     df["tick"] = pd.to_datetime(df["tick"], format="%Y%m%d-%H:%M:%S.%f")
-    ticks = df["tick"]
+    # Calculate the mid prices
     df["mid"] = (df["P_a1"] + df["P_b1"]) / 2.0
 
-    # Filter by time
-    morning = (ticks.dt.hour >= 7) & (ticks.dt.hour <= 10)
-    afternoon = (ticks.dt.hour >= 13) & (ticks.dt.hour <= 16)
-    return df[morning | afternoon]
+    # Rolling average of previous "horizon" ticks
+    df["m_minus"] = df["mid"].rolling(window=horizon).mean()
+    # Rolling average of next "horizon" ticks
+    df["m_plus"] = df["mid"].rolling(window=horizon).mean().shift(-horizon + 1)
+    df = df.loc[df["m_minus"].notna() & df["m_plus"].notna()]
 
+    # Calculate the labels
+    df["l_t"] = (df["m_plus"] - df["m_minus"]) / df["m_minus"]
+    df["label"] = df["l_t"].apply(partial(label, alpha=alpha))
 
-def build_raw_data(directory: str) -> pd.DataFrame:
-    path = Path(directory)
-
-    dfs = [
-        read_single(file)
-        for file in tqdm.tqdm(path.glob("*20230310_book_update.csv"))
-    ]
-    combined = pd.concat(dfs, ignore_index=True)
-    # Return the combined DataFrame
-    return combined
-
-
-def build_data(
-    data=Path("data/"),
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    dec_data = np.loadtxt(data / "Train_Dst_NoAuction_DecPre_CF_7.txt")
-    dec_train = dec_data[:, : int(np.floor(dec_data.shape[1] * 0.8))]
-    dec_val = dec_data[:, int(np.floor(dec_data.shape[1] * 0.8)) :]
-
-    dec_test1 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_7.txt")
-    dec_test2 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_8.txt")
-    dec_test3 = np.loadtxt(data / "Test_Dst_NoAuction_DecPre_CF_9.txt")
-    dec_test = np.hstack((dec_test1, dec_test2, dec_test3))
-
-    print(dec_train.shape, dec_val.shape, dec_test.shape)
-    return dec_train, dec_val, dec_test
+    return df[FEATURES], df["label"].map(LABEL_MAPPING), df["tick"]
 
 
 def to_classification(
-    data: np.ndarray,
-    T: int = 100,
+    X: np.ndarray,
+    y: np.ndarray,
+    ticks: pd.Series,
+    T: int = 10,
 ) -> tuple[np.ndarray, np.ndarray]:
     # Select relevant columns
-    df = np.array(data[:40, :].T)
-    dY = np.array(data[-5:, :].T)
+    df = np.array(X)
+    dY = np.array(y)
 
     # Form the lag-features
     N, D = df.shape
-    dataY = dY[T - 1 : N]
+    dt = ticks[T - 1 : N]
     dataX = np.zeros((N - T + 1, T, D))
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
-    x, y = dataX[:, None], dataY[:, -1] - 1
-    return x.astype(np.float32), y.astype(np.int64)
+
+    dataY = dY[T - 1 : N]
+    x, y = dataX[:, None], dataY
+
+    dt = ticks[T - 1 : N]
+    # Filter by time as the last step
+    morning = (dt.dt.hour >= 7) & (dt.dt.hour <= 10)
+    afternoon = (dt.dt.hour >= 13) & (dt.dt.hour <= 16)
+    index = morning | afternoon
+    return x[index].astype(np.float32), y[index].astype(np.int64)
