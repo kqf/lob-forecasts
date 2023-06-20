@@ -6,7 +6,7 @@ from forecasts.model import DeepLob
 
 @pytest.fixture
 def batch(device, batch_size):
-    return torch.ones((batch_size, 1, 100, 40), device=device)
+    return torch.ones((batch_size, 1, 10, 20), device=device)
 
 
 @pytest.mark.parametrize(
