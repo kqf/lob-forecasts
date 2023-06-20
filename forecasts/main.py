@@ -3,7 +3,7 @@ from functools import partial
 import skorch
 from sklearn.metrics import accuracy_score, classification_report
 
-from forecasts.data import build_data, to_classification
+from forecasts.legacy import build_data, to_classification
 from forecasts.model import build_model
 
 
