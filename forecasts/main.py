@@ -1,13 +1,23 @@
-from forecasts.data import files, read_single
+from sklearn.preprocessing import MinMaxScaler
+
+from forecasts.data import files, read_single, to_classification
 from forecasts.timer import timer
 
 
 def main():
-    with timer("Load the raw data"):
+    scaler = MinMaxScaler()
+    with timer("Learn the normalization"):
         for file in files():
-            df = read_single(file)
+            features, *_ = read_single(file)
+            scaler.partial_fit(features)
+
+    with timer("Normalize the features"):
+        for file in files():
+            features, labels, dt = read_single(file)
+            X, y = to_classification(scaler.transform(features), labels, dt)
+            print("~", X.shape, y.shape)
             continue
-    print(df.head())
+    # print(df.head())
 
 
 if __name__ == "__main__":

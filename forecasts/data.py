@@ -73,7 +73,18 @@ FEATURES = [
     "V_a4",
     "P_b4",
     "V_b4",
+    "P_a5",
+    "V_a5",
+    "P_b5",
+    "V_b5",
 ]
+
+
+LABEL_MAPPING = {
+    "up": 0,
+    "down": 1,
+    "stationary": 2,
+}
 
 
 def label(l_t: float, alpha: float) -> str:
@@ -100,7 +111,6 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
         low_memory=True,
     )
     df["tick"] = pd.to_datetime(df["tick"], format="%Y%m%d-%H:%M:%S.%f")
-    ticks = df["tick"]
     # Calculate the mid prices
     df["mid"] = (df["P_a1"] + df["P_b1"]) / 2.0
 
@@ -115,16 +125,13 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
     df["label"] = df["l_t"].apply(partial(label, alpha=alpha))
     print(df["label"].value_counts())
 
-    # Filter by time
-    morning = (ticks.dt.hour >= 7) & (ticks.dt.hour <= 10)
-    afternoon = (ticks.dt.hour >= 13) & (ticks.dt.hour <= 16)
-    print(f"After removing invalid timing {len(df)=}")
-    return df.loc[morning | afternoon]
+    return df[FEATURES], df["label"].map(LABEL_MAPPING), df["tick"]
 
 
-def to_sequences_classification(
+def to_classification(
     X: np.ndarray,
     y: np.ndarray,
+    ticks: pd.Series,
     T: int = 10,
 ) -> tuple[np.ndarray, np.ndarray]:
     # Select relevant columns
@@ -133,9 +140,17 @@ def to_sequences_classification(
 
     # Form the lag-features
     N, D = df.shape
-    dataY = dY[T - 1 : N]
+    dt = ticks[T - 1 : N]
     dataX = np.zeros((N - T + 1, T, D))
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
+
+    dataY = dY[T - 1 : N]
     x, y = dataX[:, None], dataY
-    return x.astype(np.float32), y.astype(np.int64)
+
+    dt = ticks[T - 1 : N]
+    # Filter by time as the last step
+    morning = (dt.dt.hour >= 7) & (dt.dt.hour <= 10)
+    afternoon = (dt.dt.hour >= 13) & (dt.dt.hour <= 16)
+    index = morning | afternoon
+    return x[index].astype(np.float32), y[index].astype(np.int64)
