@@ -84,6 +84,12 @@ def label(l_t: float, alpha: float) -> str:
     return "stationary"
 
 
+def files(directory: str = "data/EURUSD/"):
+    path = Path(directory)
+    for file in tqdm.tqdm(path.glob("*20230310_book_update.csv")):
+        yield file
+
+
 def read_single(path, horizon: int = 10, alpha=0.000015):
     usecols = [c for c in COLUMNS[2:] if not c.startswith("exclude")]
     df = pd.read_csv(
@@ -102,7 +108,7 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
     df["m_minus"] = df["mid"].rolling(window=horizon).mean()
     # Rolling average of next "horizon" ticks
     df["m_plus"] = df["mid"].rolling(window=horizon).mean().shift(-horizon + 1)
-    df = df[df["m_minus"].notna() & df["m_plus"].notna()]
+    df = df.loc[df["m_minus"].notna() & df["m_plus"].notna()]
 
     # Calculate the labels
     df["l_t"] = (df["m_plus"] - df["m_minus"]) / df["m_minus"]
@@ -113,19 +119,7 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
     morning = (ticks.dt.hour >= 7) & (ticks.dt.hour <= 10)
     afternoon = (ticks.dt.hour >= 13) & (ticks.dt.hour <= 16)
     print(f"After removing invalid timing {len(df)=}")
-    return df[morning | afternoon]
-
-
-def build_raw_data(directory: str) -> pd.DataFrame:
-    path = Path(directory)
-
-    dfs = [
-        read_single(file)
-        for file in tqdm.tqdm(path.glob("*20230310_book_update.csv"))
-    ]
-    combined = pd.concat(dfs, ignore_index=True)
-    # Return the combined DataFrame
-    return combined
+    return df.loc[morning | afternoon]
 
 
 def build_data(
@@ -159,4 +153,23 @@ def to_classification(
     for i in range(T, N + 1):
         dataX[i - T] = df[i - T : i, :]
     x, y = dataX[:, None], dataY[:, -1] - 1
+    return x.astype(np.float32), y.astype(np.int64)
+
+
+def to_sequences_classification(
+    X: np.ndarray,
+    y: np.ndarray,
+    T: int = 10,
+) -> tuple[np.ndarray, np.ndarray]:
+    # Select relevant columns
+    df = np.array(X)
+    dY = np.array(y)
+
+    # Form the lag-features
+    N, D = df.shape
+    dataY = dY[T - 1 : N]
+    dataX = np.zeros((N - T + 1, T, D))
+    for i in range(T, N + 1):
+        dataX[i - T] = df[i - T : i, :]
+    x, y = dataX[:, None], dataY
     return x.astype(np.float32), y.astype(np.int64)

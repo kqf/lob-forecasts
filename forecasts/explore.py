@@ -1,10 +1,12 @@
-from forecasts.data import build_raw_data
+from forecasts.data import files, read_single
 from forecasts.timer import timer
 
 
 def main():
     with timer("Load the raw data"):
-        df = build_raw_data("data/EURUSD/")
+        for file in files():
+            df = read_single(file)
+            continue
     print(df.head())
 
 
