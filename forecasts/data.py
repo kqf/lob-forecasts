@@ -1,5 +1,6 @@
 from functools import partial
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -95,9 +96,21 @@ def label(l_t: float, alpha: float) -> str:
     return "stationary"
 
 
-def files(directory: str = "data/EURUSD/"):
+def files(
+    subset: Literal["train"] | Literal["valid"] | Literal["test"] = "train",
+    directory: str = "data/EURUSD/",
+    n_valid: int = 5,
+    n_test: int = 1,
+):
     path = Path(directory)
-    for file in tqdm.tqdm(path.glob("*20230310_book_update.csv")):
+    # Sort the files by date
+    files = sorted(path.glob("*.csv"), key=lambda x: x.stem.split("_")[1])
+    sets = {
+        "train": files[: -n_valid - n_test],
+        "valid": files[-n_valid - n_test : -n_valid],
+        "test": files[-n_valid:],
+    }
+    for file in tqdm.tqdm(sets[subset]):
         yield file
 
 
@@ -123,7 +136,6 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
     # Calculate the labels
     df["l_t"] = (df["m_plus"] - df["m_minus"]) / df["m_minus"]
     df["label"] = df["l_t"].apply(partial(label, alpha=alpha))
-    print(df["label"].value_counts())
 
     return df[FEATURES], df["label"].map(LABEL_MAPPING), df["tick"]
 
