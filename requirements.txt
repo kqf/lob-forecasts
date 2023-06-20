@@ -6,7 +6,6 @@ scikit-learn
 skorch
 imbalanced-learn
 
-
 pytest
 pytest-cov
 black

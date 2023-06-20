@@ -2,6 +2,7 @@
 *.txt
 *.csv
 *.zip
+*.npy
 
 # Tools
 .git/
