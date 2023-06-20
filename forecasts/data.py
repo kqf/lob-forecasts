@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -75,7 +76,15 @@ FEATURES = [
 ]
 
 
-def read_single(path):
+def label(l_t: float, alpha: float) -> str:
+    if l_t > alpha:
+        return "up"
+    if l_t < -alpha:
+        return "down"
+    return "stationary"
+
+
+def read_single(path, horizon: int = 10, alpha=0.000015):
     usecols = [c for c in COLUMNS[2:] if not c.startswith("exclude")]
     df = pd.read_csv(
         path,
@@ -86,11 +95,24 @@ def read_single(path):
     )
     df["tick"] = pd.to_datetime(df["tick"], format="%Y%m%d-%H:%M:%S.%f")
     ticks = df["tick"]
+    # Calculate the mid prices
     df["mid"] = (df["P_a1"] + df["P_b1"]) / 2.0
+
+    # Rolling average of previous "horizon" ticks
+    df["m_minus"] = df["mid"].rolling(window=horizon).mean()
+    # Rolling average of next "horizon" ticks
+    df["m_plus"] = df["mid"].rolling(window=horizon).mean().shift(-horizon + 1)
+    df = df[df["m_minus"].notna() & df["m_plus"].notna()]
+
+    # Calculate the labels
+    df["l_t"] = (df["m_plus"] - df["m_minus"]) / df["m_minus"]
+    df["label"] = df["l_t"].apply(partial(label, alpha=alpha))
+    print(df["label"].value_counts())
 
     # Filter by time
     morning = (ticks.dt.hour >= 7) & (ticks.dt.hour <= 10)
     afternoon = (ticks.dt.hour >= 13) & (ticks.dt.hour <= 16)
+    print(f"After removing invalid timing {len(df)=}")
     return df[morning | afternoon]
 
 

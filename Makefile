@@ -1,5 +1,5 @@
 all: data
-	python forecasts/main.py
+	python forecasts/explore.py
 
 data: file_id = <paste your file id here>
 data:
