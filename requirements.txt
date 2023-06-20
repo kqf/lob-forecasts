@@ -4,6 +4,7 @@ tqdm
 matplotlib
 scikit-learn
 skorch
+imbalanced-learn
 
 
 pytest
