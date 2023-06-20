@@ -1,8 +1,13 @@
+from functools import partial
+
 import numpy as np
+import skorch
 from imblearn.under_sampling import RandomUnderSampler
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 
 from forecasts.data import files, read_single, to_classification
+from forecasts.model import build_model
 from forecasts.timer import timer
 
 
@@ -31,6 +36,7 @@ def build_dataset(
     scaler,
     downsample=downsample,
 ) -> tuple[np.ndarray, np.ndarray]:
+    return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
     xx, yy = [], []
     for file in files(subset=subset):
         features, labels, dt = read_single(file)
@@ -46,12 +52,16 @@ def build_dataset(
     return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
 
+def train_split(X, y, X_valid, y_valid):
+    return X, skorch.dataset.Dataset(X=X_valid, y=y_valid)
+
+
 def main():
     scaler = MinMaxScaler()
-    with timer("Learn the normalization"):
-        for file in files(subset="train"):
-            features, *_ = read_single(file)
-            scaler.partial_fit(features)
+    # with timer("Learn the normalization"):
+    #     for file in files(subset="train"):
+    #         features, *_ = read_single(file)
+    #         scaler.partial_fit(features)
 
     with timer("Normalize the features"):
         X_train, y_train = build_dataset("train", scaler)
@@ -61,14 +71,21 @@ def main():
 
     with timer("Build the test set"):
         # No downsampling for test set to simulate realistic scenario
-        X_test, y_test = build_dataset(
+        X_test_, y_test_ = build_dataset(
             "test",
             scaler,
             downsample=no_downsample,
         )
-    print(X_train.shape, y_train.shape)
-    print(X_valid.shape, y_valid.shape)
-    print(X_test.shape, y_test.shape)
+    model = build_model(
+        num_classes=3,
+        batch_size=64,
+        train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
+    )
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test_)
+    print()
+    print("accuracy_score:", accuracy_score(y_test_, y_pred))
+    print(classification_report(y_test_, y_pred, digits=4))
 
 
 if __name__ == "__main__":
