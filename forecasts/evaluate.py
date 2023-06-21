@@ -13,7 +13,7 @@ def main():
     with timer("Build the test set"):
         # No downsampling for test set to simulate realistic scenario
         X_test_, y_test_ = build_dataset(
-            "test",
+            "valid",
             scaler,
             downsample=no_downsample,
         )
@@ -23,6 +23,9 @@ def main():
         batch_size=64,
         train_split=None,
     )
+    model.initialize()
+    model.load_params(f_params="data/best.pt")
+
     y_pred = model.predict(X_test_)
     print()
     print("accuracy_score:", accuracy_score(y_test_, y_pred))
