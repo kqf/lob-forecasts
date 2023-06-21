@@ -193,7 +193,7 @@ def build_model(
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
         optimizer=torch.optim.Adam,
-        optimizer__lr=0.0001,
+        optimizer__lr=0.00005,
         batch_size=batch_size,
         iterator_train__shuffle=True,
         max_epochs=15,
@@ -202,7 +202,7 @@ def build_model(
             skorch.callbacks.ProgressBar(),
             PlotLossCallback(),
             skorch.callbacks.Checkpoint(
-                f_params="best.pt",
+                f_params="data/best.pt",
             ),
         ],
     )
