@@ -13,7 +13,7 @@ def main():
     with timer("Build the test set"):
         # No downsampling for test set to simulate realistic scenario
         X_test_, y_test_ = build_dataset(
-            "valid",
+            "test",
             scaler,
             downsample=no_downsample,
         )

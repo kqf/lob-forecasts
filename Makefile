@@ -2,6 +2,10 @@ all: data
 	python forecasts/main.py
 
 
+evaluate: data data/best.pt
+	python forecasts/evaluate.py
+
+
 data: file_id = <paste your file id here>
 data:
 	# gdown https://drive.google.com/uc?id=$(file_id)
