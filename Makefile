@@ -2,7 +2,7 @@ all: data
 	python forecasts/main.py
 
 
-evaluate: data best.pt
+evaluate: data data/best.pt
 	python forecasts/evaluate.py
 
 
