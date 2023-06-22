@@ -6,9 +6,17 @@ evaluate: data data/best.pt
 	python forecasts/evaluate.py
 
 
+best.pt:
+	mkdir -p data/
+	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.1/best.pt
+	mv best.pt data/
+	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.1/scaler.pickle
+	mv scaler.pickle data/
+
+
 data: file_id = <paste your file id here>
 data:
-	# gdown https://drive.google.com/uc?id=$(file_id)
+	gdown https://drive.google.com/uc?id=$(file_id)
 	mkdir -p data/
 	unzip EURUSD.zip -d data/
 
