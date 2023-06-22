@@ -6,7 +6,7 @@ evaluate: data data/best.pt
 	python forecasts/evaluate.py
 
 
-best.pt:
+data/best.pt:
 	mkdir -p data/
 	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.1/best.pt
 	mv best.pt data/
