@@ -6,6 +6,7 @@ scikit-learn
 skorch
 imbalanced-learn
 
+gdown  # needed to download the datasets
 pytest
 pytest-cov
 black
