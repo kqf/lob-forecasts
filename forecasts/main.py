@@ -46,9 +46,8 @@ def build_dataset(
     scaler,
     downsample=downsample,
 ) -> tuple[np.ndarray, np.ndarray]:
-    XX, yy = np.empty((0, 1, 10, 20), dtype=np.float32), np.empty(
-        (0), dtype=np.int64
-    )
+    XX = np.empty((0, 1, 10, 20), dtype=np.float32)
+    yy = np.empty((0), dtype=np.int64)
     for file in files(subset=subset):
         features, labels, dt = read_single(file)
         X, y = to_classification(scaler.transform(features), labels, dt)
@@ -60,8 +59,6 @@ def build_dataset(
 
     np.save(f"data/X_{subset}.npy", XX)
     np.save(f"data/y_{subset}.npy", yy)
-    print("Saved")
-
     return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
 
