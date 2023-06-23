@@ -74,24 +74,25 @@ class DeepLob(torch.nn.Module):
             torch.nn.BatchNorm2d(32),
             torch.nn.Conv2d(
                 in_channels=32,
-                out_channels=32,
+                out_channels=64,
                 kernel_size=(4, 1),
+                padding=(1, 0),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
-            torch.nn.BatchNorm2d(32),
+            torch.nn.BatchNorm2d(64),
             torch.nn.Conv2d(
-                in_channels=32,
-                out_channels=32,
+                in_channels=64,
+                out_channels=64,
                 kernel_size=(4, 1),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
-            torch.nn.BatchNorm2d(32),
+            torch.nn.BatchNorm2d(64),
         )
 
         # inception moduels
         self.inp1 = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=32,
+                in_channels=64,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",
@@ -109,7 +110,7 @@ class DeepLob(torch.nn.Module):
         )
         self.inp2 = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=32,
+                in_channels=64,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",
@@ -132,7 +133,7 @@ class DeepLob(torch.nn.Module):
                 padding=(1, 0),
             ),
             torch.nn.Conv2d(
-                in_channels=32,
+                in_channels=64,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",
@@ -193,7 +194,7 @@ def build_model(
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
         optimizer=torch.optim.Adam,
-        optimizer__lr=0.0004,
+        optimizer__lr=0.00001,
         batch_size=batch_size,
         iterator_train__shuffle=True,
         max_epochs=15,
