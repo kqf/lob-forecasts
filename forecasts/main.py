@@ -3,7 +3,7 @@ from functools import partial
 import numpy as np
 import skorch
 from imblearn.under_sampling import RandomUnderSampler
-from joblib import dump, load
+from joblib import load
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 
@@ -46,6 +46,7 @@ def build_dataset(
     scaler,
     downsample=downsample,
 ) -> tuple[np.ndarray, np.ndarray]:
+    return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
     for file in files(subset=subset):
@@ -69,10 +70,10 @@ def train_split(X, y, X_valid, y_valid):
 def main():
     scaler = MinMaxScaler()
     with timer("Learn the normalization"):
-        for file in files(subset="train"):
-            features, *_ = read_single(file)
-            scaler.partial_fit(features)
-        dump(scaler, "data/scaler.pickle")
+        # for file in files(subset="train"):
+        #     features, *_ = read_single(file)
+        #     scaler.partial_fit(features)
+        # dump(scaler, "data/scaler.pickle")
         scaler = load("data/scaler.pickle")
 
     with timer("Build the train set"):

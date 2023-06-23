@@ -25,7 +25,7 @@ class DeepLob(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels=32,
                 out_channels=32,
-                kernel_size=(2, 1),
+                kernel_size=(4, 1),
                 padding=(2, 1),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
@@ -33,7 +33,7 @@ class DeepLob(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels=32,
                 out_channels=32,
-                kernel_size=(2, 1),
+                kernel_size=(4, 1),
                 padding=(2, 2),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
@@ -43,7 +43,7 @@ class DeepLob(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels=32,
                 out_channels=32,
-                kernel_size=(1, 1),
+                kernel_size=(1, 2),
                 stride=(1, 2),
             ),
             torch.nn.Tanh(),
