@@ -194,7 +194,7 @@ def build_model(
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
         optimizer=torch.optim.Adam,
-        optimizer__lr=0.00001,
+        optimizer__lr=0.00002,
         batch_size=batch_size,
         iterator_train__shuffle=True,
         max_epochs=15,
