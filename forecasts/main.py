@@ -92,7 +92,7 @@ def main():
 
     model = build_model(
         num_classes=3,
-        batch_size=64,
+        batch_size=2**10,
         train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
     )
     model.fit(X_train, y_train)
