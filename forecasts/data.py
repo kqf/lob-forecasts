@@ -145,7 +145,7 @@ def to_classification(
     y: np.ndarray,
     ticks: pd.Series,
     T: int = 10,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     # Select relevant columns
     df = np.array(X)
     dY = np.array(y)
@@ -165,4 +165,6 @@ def to_classification(
     morning = (dt.dt.hour >= 7) & (dt.dt.hour <= 10)
     afternoon = (dt.dt.hour >= 13) & (dt.dt.hour <= 16)
     index = morning | afternoon
-    return x[index].astype(np.float32), y[index].astype(np.int64)
+
+    pdt = pd.DataFrame({"Date_time": dt[index]})
+    return x[index].astype(np.float32), y[index].astype(np.int64), pdt
