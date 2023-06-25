@@ -51,7 +51,7 @@ def build_dataset(
     yy = np.empty((0), dtype=np.int64)
     for file in files(subset=subset):
         features, labels, dt = read_single(file)
-        X, y = to_classification(scaler.transform(features), labels, dt)
+        X, y, _ = to_classification(scaler.transform(features), labels, dt)
         X, y = remove_nans(X, y)
         X, y = downsample(X, y)
 
