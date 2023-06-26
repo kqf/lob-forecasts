@@ -74,25 +74,24 @@ class DeepLob(torch.nn.Module):
             torch.nn.BatchNorm2d(32),
             torch.nn.Conv2d(
                 in_channels=32,
-                out_channels=64,
+                out_channels=32,
                 kernel_size=(4, 1),
-                padding=(1, 0),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
-            torch.nn.BatchNorm2d(64),
+            torch.nn.BatchNorm2d(32),
             torch.nn.Conv2d(
-                in_channels=64,
-                out_channels=64,
+                in_channels=32,
+                out_channels=32,
                 kernel_size=(4, 1),
             ),
             torch.nn.LeakyReLU(negative_slope=0.01),
-            torch.nn.BatchNorm2d(64),
+            torch.nn.BatchNorm2d(32),
         )
 
         # inception moduels
         self.inp1 = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=64,
+                in_channels=32,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",
@@ -110,7 +109,7 @@ class DeepLob(torch.nn.Module):
         )
         self.inp2 = torch.nn.Sequential(
             torch.nn.Conv2d(
-                in_channels=64,
+                in_channels=32,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",
@@ -133,7 +132,7 @@ class DeepLob(torch.nn.Module):
                 padding=(1, 0),
             ),
             torch.nn.Conv2d(
-                in_channels=64,
+                in_channels=32,
                 out_channels=64,
                 kernel_size=(1, 1),
                 padding="same",

@@ -6,11 +6,15 @@ evaluate: data data/best.pt
 	python forecasts/evaluate.py
 
 
+infer: data data/best.pt
+	python forecasts/infer.py
+
+
 data/best.pt:
 	mkdir -p data/
-	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.1/best.pt
+	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.2/best.pt
 	mv best.pt data/
-	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.1/scaler.pickle
+	curl -O -L https://github.com/kqf/lob-forecasts/releases/download/v0.0.2/scaler.pickle
 	mv scaler.pickle data/
 
 
