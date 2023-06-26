@@ -3,7 +3,7 @@ import pandas as pd
 from joblib import load
 from sklearn.metrics import accuracy_score, classification_report
 
-from forecasts.data import files, read_single, to_classification
+from forecasts.data import COLUMNS, files, read_single, to_classification
 from forecasts.model import build_model
 from forecasts.timer import timer
 
@@ -20,16 +20,12 @@ def remove_nans(X, y, dt) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
 
 def build_eval_dataset(
     scaler,
-) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str, pd.DataFrame]:
+) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str]:
     first_test_day = next(iter(files(subset="test")))
     features, labels, dt = read_single(first_test_day)
-    df = features.copy()
-    df["Date_time"] = dt.copy()["Date_time"]
-
     X, y, dt = to_classification(scaler.transform(features), labels, dt)
     X, y, dt = remove_nans(X, y, dt)
-
-    return X, y, dt, first_test_day, df
+    return X, y, dt, first_test_day
 
 
 LABEL_MAPPING = {
@@ -39,10 +35,15 @@ LABEL_MAPPING = {
 }
 
 
-def to_csv(fname: str, df: pd.DataFrame, dt: pd.DataFrame) -> None:
+def to_csv(fname, dt: pd.DataFrame) -> None:
+    df = pd.read_csv(fname, header=None, names=COLUMNS)
+    df["Date_time"] = pd.to_datetime(
+        df["Date_time"],
+        format="%Y%m%d-%H:%M:%S.%f",
+    )
     merged = pd.merge(df, dt, on="Date_time", how="left")
-    print(dt)
-    merged.to_csv(f"{fname}-predictions.csv", index=False)
+    merged["Predictions"] = merged["Predictions"].fillna(0)
+    merged.to_csv(f"{fname.stem}-predictions.csv", index=False)
 
 
 def main():
@@ -50,7 +51,7 @@ def main():
         scaler = load("data/scaler.pickle")
 
     with timer("Build the test set"):
-        X_test_, y_test_, dt, fname, df = build_eval_dataset(scaler)
+        X_test_, y_test_, dt, fname = build_eval_dataset(scaler)
 
     model = build_model(
         num_classes=3,
@@ -66,7 +67,7 @@ def main():
     print(classification_report(y_test_, y_pred, digits=4))
     dt["Predictions"] = y_pred
     dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
-    to_csv(fname.stem, df, dt)
+    to_csv(fname, dt)
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ import tqdm
 COLUMNS = [
     "idx",
     "currency",
-    "tick",
+    "Date_time",
     "P_a1",
     "P_a2",
     "P_a3",
@@ -123,7 +123,7 @@ def read_single(path, horizon: int = 10, alpha=0.000015):
         usecols=usecols,
         low_memory=True,
     )
-    df["tick"] = pd.to_datetime(df["tick"], format="%Y%m%d-%H:%M:%S.%f")
+    df["tick"] = pd.to_datetime(df["Date_time"], format="%Y%m%d-%H:%M:%S.%f")
     # Calculate the mid prices
     df["mid"] = (df["P_a1"] + df["P_b1"]) / 2.0
 
