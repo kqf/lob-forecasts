@@ -4,6 +4,9 @@
 *.zip
 *.npy
 download.sh
+*.json
+*.pt
+*.pickle
 
 # Tools
 .git/
