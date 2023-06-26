@@ -21,6 +21,7 @@ def remove_nans(X, y, dt) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
 def build_eval_dataset(
     scaler,
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str]:
+def build_eval_dataset(scaler) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     first_test_day = next(iter(files(subset="test")))
     features, labels, dt = read_single(first_test_day)
     X, y, dt = to_classification(scaler.transform(features), labels, dt)
@@ -58,7 +59,7 @@ def main():
     dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
     print(dt)
     dt.to_csv(f"{fname.stem}-predictions.csv", index=False)
-
+    
 
 if __name__ == "__main__":
     main()
