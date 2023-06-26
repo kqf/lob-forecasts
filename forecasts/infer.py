@@ -23,10 +23,12 @@ def build_eval_dataset(
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str, pd.DataFrame]:
     first_test_day = next(iter(files(subset="test")))
     features, labels, dt = read_single(first_test_day)
-    X, y, dt = to_classification(scaler.transform(features), labels, dt)
-    X, y, dt = remove_nans(X, y, dt)
     df = features.copy()
     df["Date_time"] = dt.copy()["Date_time"]
+
+    X, y, dt = to_classification(scaler.transform(features), labels, dt)
+    X, y, dt = remove_nans(X, y, dt)
+
     return X, y, dt, first_test_day, df
 
 
@@ -37,12 +39,18 @@ LABEL_MAPPING = {
 }
 
 
+def to_csv(fname: str, df: pd.DataFrame, dt: pd.DataFrame) -> None:
+    merged = pd.merge(df, dt, on="Date_time", how="left")
+    print(dt)
+    merged.to_csv(f"{fname}-predictions.csv", index=False)
+
+
 def main():
     with timer("Read the normalization"):
         scaler = load("data/scaler.pickle")
 
     with timer("Build the test set"):
-        X_test_, y_test_, dt, fname = build_eval_dataset(scaler)
+        X_test_, y_test_, dt, fname, df = build_eval_dataset(scaler)
 
     model = build_model(
         num_classes=3,
@@ -58,8 +66,7 @@ def main():
     print(classification_report(y_test_, y_pred, digits=4))
     dt["Predictions"] = y_pred
     dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
-    print(dt)
-    dt.to_csv(f"{fname.stem}-predictions.csv", index=False)
+    to_csv(fname.stem, df, dt)
 
 
 if __name__ == "__main__":
