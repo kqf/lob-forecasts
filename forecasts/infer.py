@@ -3,7 +3,7 @@ import pandas as pd
 from joblib import load
 from sklearn.metrics import accuracy_score, classification_report
 
-from forecasts.data import files, read_single, to_classification
+from forecasts.data import COLUMNS, files, read_single, to_classification
 from forecasts.model import build_model
 from forecasts.timer import timer
 
@@ -21,7 +21,6 @@ def remove_nans(X, y, dt) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
 def build_eval_dataset(
     scaler,
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str]:
-def build_eval_dataset(scaler) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     first_test_day = next(iter(files(subset="test")))
     features, labels, dt = read_single(first_test_day)
     X, y, dt = to_classification(scaler.transform(features), labels, dt)
@@ -34,6 +33,17 @@ LABEL_MAPPING = {
     1: -1,
     2: 0,
 }
+
+
+def to_csv(fname, dt: pd.DataFrame) -> None:
+    df = pd.read_csv(fname, header=None, names=COLUMNS)
+    df["Date_time"] = pd.to_datetime(
+        df["Date_time"],
+        format="%Y%m%d-%H:%M:%S.%f",
+    )
+    merged = pd.merge(df, dt, on="Date_time", how="left")
+    merged["Predictions"] = merged["Predictions"].fillna(0)
+    merged.to_csv(f"{fname.stem}-predictions.csv", index=False)
 
 
 def main():
@@ -57,9 +67,8 @@ def main():
     print(classification_report(y_test_, y_pred, digits=4))
     dt["Predictions"] = y_pred
     dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
-    print(dt)
-    dt.to_csv(f"{fname.stem}-predictions.csv", index=False)
-    
+    to_csv(fname, dt)
+
 
 if __name__ == "__main__":
     main()
