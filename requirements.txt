@@ -5,6 +5,7 @@ matplotlib
 scikit-learn
 skorch
 imbalanced-learn
+pandas
 
 gdown  # needed to download the datasets
 pytest
