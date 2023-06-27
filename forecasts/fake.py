@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+
+from forecasts.data import COLUMNS
 
 
 def fake(
@@ -10,4 +13,9 @@ def fake(
     df = pd.DataFrame({"Date_time": datetime_range})
     df["idx"] = df.index
     df["currency"] = "EURUSD"
+    for c in COLUMNS:
+        if c in df.colums:
+            continue
+        df[c] = np.nan
+
     return df
