@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from forecasts.data import COLUMNS
+from forecasts.data import COLUMNS, FEATURES
 
 
 def fake(
@@ -17,5 +17,8 @@ def fake(
         if c in df.colums:
             continue
         df[c] = np.nan
+
+    for c in FEATURES:
+        df[c] = np.random.rand(*df.index.values.shape)
 
     return df
