@@ -14,7 +14,7 @@ def fake(
     df["idx"] = df.index
     df["currency"] = "EURUSD"
     for c in COLUMNS:
-        if c in df.colums:
+        if c in df.columns:
             continue
         df[c] = np.nan
 
