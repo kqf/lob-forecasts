@@ -20,5 +20,4 @@ def fake(
 
     for c in FEATURES:
         df[c] = np.random.rand(*df.index.values.shape)
-
     return df
