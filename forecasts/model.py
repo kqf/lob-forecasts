@@ -186,23 +186,34 @@ def build_model(
     num_classes: int,
     batch_size: int,
     train_split: Callable,
+    max_epochs: int = 15,
+    lr: float = 0.00002,
 ) -> skorch.NeuralNetClassifier:
     return skorch.NeuralNetClassifier(
         module=DeepLob,
         module__num_classes=num_classes,
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
+        criterion__weight=torch.Tensor([1.0, 1.0, 0.5]),
         optimizer=torch.optim.Adam,
-        optimizer__lr=0.00002,
+        optimizer__lr=lr,
         batch_size=batch_size,
         iterator_train__shuffle=True,
-        max_epochs=15,
+        max_epochs=max_epochs,
         device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         callbacks=[
+            skorch.callbacks.LRScheduler(
+                policy=torch.optim.lr_scheduler.ReduceLROnPlateau,
+                patience=2,
+                # policy="ReduceLROnPlateau",
+                monitor="valid_acc",
+                # step_every="batch",
+            ),
             skorch.callbacks.ProgressBar(),
             PlotLossCallback(),
             skorch.callbacks.Checkpoint(
                 f_params="data/best.pt",
+                # monitor="valid_acc_best",
             ),
         ],
     )
