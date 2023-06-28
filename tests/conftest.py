@@ -23,8 +23,8 @@ def fake_dataset(tmp_path: pathlib.Path) -> pathlib.Path:
 
 @pytest.fixture
 def dataset(tmp_path: pathlib.Path) -> pathlib.Path:
-    datadir = tmp_path / " data"
+    datadir = tmp_path / "data"
     datadir.mkdir(exist_ok=True)
     df = fake()
-    df.to_csv(datadir, index=False, header=None)
+    df.to_csv(datadir / "data.csv", index=False, header=None)
     return datadir
