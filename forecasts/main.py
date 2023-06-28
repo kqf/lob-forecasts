@@ -45,12 +45,19 @@ def build_dataset(
     subset,
     scaler,
     downsample=downsample,
+    alpha=0.00004,
 ) -> tuple[np.ndarray, np.ndarray]:
-    return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
+    # return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
+
+    return (
+        np.load(f"data/X_{subset}_{alpha}.npy"),
+        np.load(f"data/y_{subset}_{alpha}.npy"),
+    )
+
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
     for file in files(subset=subset):
-        features, labels, dt = read_single(file)
+        features, labels, dt = read_single(file, alpha=alpha)
         X, y, _ = to_classification(scaler.transform(features), labels, dt)
         X, y = remove_nans(X, y)
         X, y = downsample(X, y)
@@ -58,9 +65,12 @@ def build_dataset(
         XX = np.append(XX, X, axis=0)
         yy = np.append(yy, y)
 
-    np.save(f"data/X_{subset}.npy", XX)
-    np.save(f"data/y_{subset}.npy", yy)
-    return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
+    np.save(f"data/X_{subset}_{alpha}.npy", XX)
+    np.save(f"data/y_{subset}_{alpha}.npy", yy)
+    return (
+        np.load(f"data/X_{subset}_{alpha}.npy"),
+        np.load(f"data/y_{subset}_{alpha}.npy"),
+    )
 
 
 def train_split(X, y, X_valid, y_valid):
@@ -93,10 +103,16 @@ def main():
     model = build_model(
         num_classes=3,
         batch_size=2**10,
+        max_epochs=50,
+        lr=0.00002,
         train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
     )
     model.fit(X_train, y_train)
+
+    model.initialize()
+    model.load_params(f_params="data/best.pt")
     y_pred = model.predict(X_test_)
+
     print()
     print("accuracy_score:", accuracy_score(y_test_, y_pred))
     print(classification_report(y_test_, y_pred, digits=4))
