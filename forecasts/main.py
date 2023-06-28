@@ -47,6 +47,7 @@ def build_dataset(
     downsample=downsample,
     alpha=0.00004,
 ) -> tuple[np.ndarray, np.ndarray]:
+    return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
     for file in files(subset=subset):
