@@ -20,6 +20,7 @@ def remove_nans(X, y, dt) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
 
 def build_eval_dataset(
     scaler,
+    alpha=0.00004,
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str]:
     first_test_day = next(iter(files(subset="test")))
     features, labels, dt = read_single(first_test_day)
