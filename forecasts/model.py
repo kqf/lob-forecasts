@@ -194,7 +194,6 @@ def build_model(
         module__num_classes=num_classes,
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
-        criterion__weight=torch.Tensor([1.0, 1.0, 0.9]),
         optimizer=torch.optim.Adam,
         optimizer__lr=lr,
         batch_size=batch_size,
@@ -202,11 +201,11 @@ def build_model(
         max_epochs=max_epochs,
         device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         callbacks=[
-            skorch.callbacks.LRScheduler(
-                policy=torch.optim.lr_scheduler.ReduceLROnPlateau,
-                patience=3,
-                monitor="valid_acc",
-            ),
+            # skorch.callbacks.LRScheduler(
+            #     policy=torch.optim.lr_scheduler.ReduceLROnPlateau,
+            #     patience=3,
+            #     monitor="valid_acc",
+            # ),
             skorch.callbacks.ProgressBar(),
             PlotLossCallback(),
             skorch.callbacks.Checkpoint(
