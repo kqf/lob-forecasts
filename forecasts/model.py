@@ -194,7 +194,7 @@ def build_model(
         module__num_classes=num_classes,
         train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
-        criterion__weight=torch.Tensor([1.0, 1.0, 0.5]),
+        criterion__weight=torch.Tensor([1.0, 1.0, 0.9]),
         optimizer=torch.optim.Adam,
         optimizer__lr=lr,
         batch_size=batch_size,
@@ -204,10 +204,8 @@ def build_model(
         callbacks=[
             skorch.callbacks.LRScheduler(
                 policy=torch.optim.lr_scheduler.ReduceLROnPlateau,
-                patience=2,
-                # policy="ReduceLROnPlateau",
+                patience=3,
                 monitor="valid_acc",
-                # step_every="batch",
             ),
             skorch.callbacks.ProgressBar(),
             PlotLossCallback(),
