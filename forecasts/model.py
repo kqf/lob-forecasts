@@ -189,20 +189,20 @@ def build_model(
     train_split: Callable,
     max_epochs: int = 15,
     lr: float = 0.00002,
-    monitor_checkpoint="valid_acc_best",
+    monitor_checkpoint="valid_loss_best",
 ) -> skorch.NeuralNetClassifier:
     mlflow.log_param("num_classes", num_classes)
     mlflow.log_param("batch_size", batch_size)
     mlflow.log_param("max_epochs", max_epochs)
     mlflow.log_param("lr", lr)
     mlflow.log_param("monitor_checkpoint", monitor_checkpoint)
-    mlflow.log_param("with_ce_weights", True)
+    mlflow.log_param("with_ce_weights", False)
     return skorch.NeuralNetClassifier(
         module=DeepLob,
         module__num_classes=num_classes,
         # train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
-        criterion__weight=torch.Tensor([1.0, 1.0, 0.9]),
+        # criterion__weight=torch.Tensor([1.0, 1.0, 0.9]),
         optimizer=torch.optim.Adam,
         optimizer__lr=lr,
         batch_size=batch_size,
@@ -219,7 +219,7 @@ def build_model(
             PlotLossCallback(),
             skorch.callbacks.Checkpoint(
                 f_params="data/best.pt",
-                monitor=monitor_checkpoint,
+                # monitor=monitor_checkpoint,
             ),
             skorch.callbacks.MlflowLogger(log_on_batch_end=True),
         ],

@@ -111,7 +111,7 @@ def main():
         train_split=None,
     )
     mlflow.end_run()
-    with mlflow.start_run(run_name="track valid accuracy"):
+    with mlflow.start_run(run_name="no ce weights"):
         model.fit(X_train, y_train)
 
         model.initialize()
