@@ -56,6 +56,7 @@ def main():
         X_test_, y_test_, dt, fname = build_eval_dataset(scaler)
 
     mlflow.set_tracking_uri("http://localhost:8000/")
+    mlflow.end_run()
     with mlflow.start_run(run_name="Set the final lr", nested=True):
         model = build_model(
             num_classes=3,

@@ -110,6 +110,7 @@ def main():
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
+    mlflow.end_run()
     with mlflow.start_run(run_name="Final test"):
         model.fit(X_train, y_train)
 
