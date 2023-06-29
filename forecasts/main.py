@@ -110,7 +110,8 @@ def main():
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
-    with mlflow.start_run(run_name="initial test"):
+    mlflow.end_run()
+    with mlflow.start_run(run_name="track valid accuracy"):
         model.fit(X_train, y_train)
 
         model.initialize()
@@ -122,6 +123,7 @@ def main():
         print("accuracy_score:", acc)
         mlflow.log_metric("test_acc", acc)
         print(classification_report(y_test_, y_pred, digits=4))
+        mlflow.end_run()
 
 
 if __name__ == "__main__":
