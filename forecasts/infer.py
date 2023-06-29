@@ -5,6 +5,7 @@ from joblib import load
 from sklearn.metrics import accuracy_score, classification_report
 
 from forecasts.data import COLUMNS, files, read_single, to_classification
+from forecasts.main import RUN_NAME
 from forecasts.model import build_model
 from forecasts.timer import timer
 
@@ -57,7 +58,7 @@ def main():
 
     mlflow.set_tracking_uri("http://localhost:8000/")
     mlflow.end_run()
-    with mlflow.start_run(run_name="Set the final lr", nested=True):
+    with mlflow.start_run(run_name=RUN_NAME, nested=True):
         model = build_model(
             num_classes=3,
             batch_size=64,
