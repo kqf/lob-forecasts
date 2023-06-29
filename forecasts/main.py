@@ -106,12 +106,12 @@ def main():
         num_classes=3,
         batch_size=2**10,
         max_epochs=50,
-        lr=0.00002,
+        lr=0.00001,
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
     mlflow.end_run()
-    with mlflow.start_run(run_name="no ce weights"):
+    with mlflow.start_run(run_name="Reduce the lr"):
         model.fit(X_train, y_train)
 
         model.initialize()
