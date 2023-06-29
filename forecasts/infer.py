@@ -58,7 +58,7 @@ def main():
 
     mlflow.set_tracking_uri("http://localhost:8000/")
     mlflow.end_run()
-    with mlflow.start_run(run_name=RUN_NAME, nested=True):
+    with mlflow.start_run(run_name=f"{RUN_NAME} (infer)", nested=True):
         model = build_model(
             num_classes=3,
             batch_size=64,
