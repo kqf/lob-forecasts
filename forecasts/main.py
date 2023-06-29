@@ -48,7 +48,7 @@ def build_dataset(
     subset,
     scaler,
     downsample=downsample,
-    alpha=0.00005,
+    alpha=0.00003,
 ) -> tuple[np.ndarray, np.ndarray]:
     # return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
