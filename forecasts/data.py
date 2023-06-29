@@ -99,16 +99,16 @@ def label(l_t: float, alpha: float) -> str:
 def files(
     subset: Literal["train"] | Literal["valid"] | Literal["test"] = "train",
     directory: str = "data/EURUSD/",
-    n_valid: int = 5,
-    n_test: int = 1,
+    n_test: int = 5,
+    n_valid: int = 1,
 ):
     path = Path(directory)
     # Sort the files by date
     files = sorted(path.glob("*.csv"), key=lambda x: x.stem.split("_")[1])
     sets = {
-        "train": files[: -n_valid - n_test],
-        "valid": files[-n_valid - n_test : -n_valid],
-        "test": files[-n_valid:],
+        "train": files[: -n_test - n_valid],
+        "valid": files[-n_test - n_valid : -n_test],
+        "test": files[-n_test:],
     }
     for file in tqdm.tqdm(sets[subset]):
         yield file
