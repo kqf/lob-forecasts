@@ -1,5 +1,6 @@
-from functools import partial
+# from functools import partial
 
+import mlflow
 import numpy as np
 import skorch
 from imblearn.under_sampling import RandomUnderSampler
@@ -56,7 +57,7 @@ def build_dataset(
 
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
-    for file in files(subset=subset):
+    for file in files(subset=subset, n_valid=0):
         features, labels, dt = read_single(file, alpha=alpha)
         X, y, _ = to_classification(scaler.transform(features), labels, dt)
         X, y = remove_nans(X, y)
@@ -89,8 +90,8 @@ def main():
     with timer("Build the train set"):
         X_train, y_train = build_dataset("train", scaler)
 
-    with timer("Build the valid set"):
-        X_valid, y_valid = build_dataset("valid", scaler)
+    # with timer("Build the valid set"):
+    #     X_valid, y_valid = build_dataset("valid", scaler)
 
     with timer("Build the test set"):
         # No downsampling for test set to simulate realistic scenario
@@ -100,22 +101,28 @@ def main():
             downsample=no_downsample,
         )
 
+    mlflow.set_tracking_uri("http://localhost:8000/")
     model = build_model(
         num_classes=3,
         batch_size=2**10,
         max_epochs=50,
-        lr=0.00002,
-        train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
+        lr=0.00001,
+        # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
+        train_split=None,
     )
-    model.fit(X_train, y_train)
+    mlflow.end_run()
+    with mlflow.start_run(run_name="Final test"):
+        model.fit(X_train, y_train)
 
-    model.initialize()
-    model.load_params(f_params="data/best.pt")
-    y_pred = model.predict(X_test_)
+        model.initialize()
+        model.load_params(f_params="data/best.pt")
+        y_pred = model.predict(X_test_)
 
-    print()
-    print("accuracy_score:", accuracy_score(y_test_, y_pred))
-    print(classification_report(y_test_, y_pred, digits=4))
+        print()
+        acc = accuracy_score(y_test_, y_pred)
+        print("accuracy_score:", acc)
+        mlflow.log_metric("test_acc", acc)
+        print(classification_report(y_test_, y_pred, digits=4))
 
 
 if __name__ == "__main__":

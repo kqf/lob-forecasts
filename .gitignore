@@ -4,6 +4,7 @@
 *.zip
 *.npy
 download.sh
+mlflow.sh
 *.json
 *.pt
 *.pickle
@@ -12,6 +13,8 @@ download.sh
 .git/
 .idea/
 **/__pycache__/
+mlruns/
+mlartifacts/
 .vscode/
 .mypy_cache/
 .DS_Store
