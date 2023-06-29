@@ -12,7 +12,7 @@ from forecasts.data import files, read_single, to_classification
 from forecasts.model import build_model
 from forecasts.timer import timer
 
-RUN_NAME = "Update: alpha=0.00005, larger lr"
+RUN_NAME = "Update: alpha=0.00005, smaller lr"
 
 
 def no_downsample(
@@ -108,7 +108,7 @@ def main():
         num_classes=3,
         batch_size=2**10,
         max_epochs=50,
-        lr=0.000006,
+        lr=0.000003,
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
