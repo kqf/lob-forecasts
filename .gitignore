@@ -14,6 +14,7 @@ mlflow.sh
 .idea/
 **/__pycache__/
 mlruns/
+mlartifacts/
 .vscode/
 .mypy_cache/
 .DS_Store
