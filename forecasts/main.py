@@ -1,4 +1,4 @@
-from functools import partial
+# from functools import partial
 
 import numpy as np
 import skorch
@@ -49,14 +49,14 @@ def build_dataset(
 ) -> tuple[np.ndarray, np.ndarray]:
     # return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
-    return (
-        np.load(f"data/X_{subset}_{alpha}.npy"),
-        np.load(f"data/y_{subset}_{alpha}.npy"),
-    )
+    # return (
+    #     np.load(f"data/X_{subset}_{alpha}.npy"),
+    #     np.load(f"data/y_{subset}_{alpha}.npy"),
+    # )
 
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
-    for file in files(subset=subset):
+    for file in files(subset=subset, n_valid=0):
         features, labels, dt = read_single(file, alpha=alpha)
         X, y, _ = to_classification(scaler.transform(features), labels, dt)
         X, y = remove_nans(X, y)
@@ -89,8 +89,8 @@ def main():
     with timer("Build the train set"):
         X_train, y_train = build_dataset("train", scaler)
 
-    with timer("Build the valid set"):
-        X_valid, y_valid = build_dataset("valid", scaler)
+    # with timer("Build the valid set"):
+    #     X_valid, y_valid = build_dataset("valid", scaler)
 
     with timer("Build the test set"):
         # No downsampling for test set to simulate realistic scenario
@@ -105,7 +105,8 @@ def main():
         batch_size=2**10,
         max_epochs=50,
         lr=0.00002,
-        train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
+        # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
+        train_split=None,
     )
     model.fit(X_train, y_train)
 

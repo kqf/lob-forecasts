@@ -22,7 +22,7 @@ def build_eval_dataset(
     scaler,
     alpha=0.00004,
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, str]:
-    first_test_day = next(iter(files(subset="test")))
+    first_test_day = next(iter(files(subset="test", n_valid=0)))
     features, labels, dt = read_single(first_test_day)
     X, y, dt = to_classification(scaler.transform(features), labels, dt)
     X, y, dt = remove_nans(X, y, dt)

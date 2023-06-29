@@ -192,7 +192,7 @@ def build_model(
     return skorch.NeuralNetClassifier(
         module=DeepLob,
         module__num_classes=num_classes,
-        train_split=train_split,
+        # train_split=train_split,
         criterion=torch.nn.CrossEntropyLoss,
         criterion__weight=torch.Tensor([1.0, 1.0, 0.9]),
         optimizer=torch.optim.Adam,
