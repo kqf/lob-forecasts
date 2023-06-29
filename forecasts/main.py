@@ -1,5 +1,6 @@
 # from functools import partial
 
+import mlflow
 import numpy as np
 import skorch
 from imblearn.under_sampling import RandomUnderSampler
@@ -49,10 +50,10 @@ def build_dataset(
 ) -> tuple[np.ndarray, np.ndarray]:
     # return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
-    # return (
-    #     np.load(f"data/X_{subset}_{alpha}.npy"),
-    #     np.load(f"data/y_{subset}_{alpha}.npy"),
-    # )
+    return (
+        np.load(f"data/X_{subset}_{alpha}.npy"),
+        np.load(f"data/y_{subset}_{alpha}.npy"),
+    )
 
     XX = np.empty((0, 1, 10, 20), dtype=np.float32)
     yy = np.empty((0), dtype=np.int64)
@@ -100,6 +101,7 @@ def main():
             downsample=no_downsample,
         )
 
+    mlflow.set_tracking_uri("http://localhost:8000/")
     model = build_model(
         num_classes=3,
         batch_size=2**10,
@@ -108,15 +110,18 @@ def main():
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
-    model.fit(X_train, y_train)
+    with mlflow.start_run(run_name="initial test"):
+        model.fit(X_train, y_train)
 
-    model.initialize()
-    model.load_params(f_params="data/best.pt")
-    y_pred = model.predict(X_test_)
+        model.initialize()
+        model.load_params(f_params="data/best.pt")
+        y_pred = model.predict(X_test_)
 
-    print()
-    print("accuracy_score:", accuracy_score(y_test_, y_pred))
-    print(classification_report(y_test_, y_pred, digits=4))
+        print()
+        acc = accuracy_score(y_test_, y_pred)
+        print("accuracy_score:", acc)
+        mlflow.log_metric("test_acc", acc)
+        print(classification_report(y_test_, y_pred, digits=4))
 
 
 if __name__ == "__main__":

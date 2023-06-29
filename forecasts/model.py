@@ -213,5 +213,6 @@ def build_model(
                 f_params="data/best.pt",
                 # monitor="valid_acc_best",
             ),
+            skorch.callbacks.MlflowLogger(log_on_batch_end=True),
         ],
     )
