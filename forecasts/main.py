@@ -12,6 +12,8 @@ from forecasts.data import files, read_single, to_classification
 from forecasts.model import build_model
 from forecasts.timer import timer
 
+RUN_NAME = "Update: alpha=0.00005, smaller lr"
+
 
 def no_downsample(
     X: np.ndarray,
@@ -46,7 +48,7 @@ def build_dataset(
     subset,
     scaler,
     downsample=downsample,
-    alpha=0.00004,
+    alpha=0.00005,
 ) -> tuple[np.ndarray, np.ndarray]:
     # return np.load(f"data/X_{subset}.npy"), np.load(f"data/y_{subset}.npy")
 
@@ -106,12 +108,12 @@ def main():
         num_classes=3,
         batch_size=2**10,
         max_epochs=50,
-        lr=0.00001,
+        lr=0.000003,
         # train_split=partial(train_split, X_valid=X_valid, y_valid=y_valid),
         train_split=None,
     )
     mlflow.end_run()
-    with mlflow.start_run(run_name="Final test"):
+    with mlflow.start_run(run_name=RUN_NAME):
         model.fit(X_train, y_train)
 
         model.initialize()
