@@ -6,6 +6,7 @@ scikit-learn
 skorch
 imbalanced-learn
 pandas
+mlflow
 
 gdown  # needed to download the datasets
 pytest
