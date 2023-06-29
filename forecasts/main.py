@@ -12,7 +12,7 @@ from forecasts.data import files, read_single, to_classification
 from forecasts.model import build_model
 from forecasts.timer import timer
 
-RUN_NAME = "Update: alpha=0.00005, smaller lr"
+RUN_NAME = "Update: alpha=0.00003"
 
 
 def no_downsample(
