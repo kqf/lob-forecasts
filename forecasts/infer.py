@@ -1,3 +1,4 @@
+import mlflow
 import numpy as np
 import pandas as pd
 from joblib import load
@@ -54,21 +55,25 @@ def main():
     with timer("Build the test set"):
         X_test_, y_test_, dt, fname = build_eval_dataset(scaler)
 
-    model = build_model(
-        num_classes=3,
-        batch_size=64,
-        train_split=None,
-    )
-    model.initialize()
-    model.load_params(f_params="data/best.pt")
+    mlflow.set_tracking_uri("http://localhost:8000/")
+    with mlflow.start_run(run_name="Set the final lr", nested=True):
+        model = build_model(
+            num_classes=3,
+            batch_size=64,
+            train_split=None,
+        )
+        model.initialize()
+        model.load_params(f_params="data/best.pt")
 
-    y_pred = model.predict(X_test_)
-    print()
-    print("accuracy_score:", accuracy_score(y_test_, y_pred))
-    print(classification_report(y_test_, y_pred, digits=4))
-    dt["Predictions"] = y_pred
-    dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
-    to_csv(fname, dt)
+        y_pred = model.predict(X_test_)
+        print()
+        acc = accuracy_score(y_test_, y_pred)
+        print("accuracy_score:", acc)
+        print(classification_report(y_test_, y_pred, digits=4))
+        mlflow.log_metric("test_acc", acc)
+        dt["Predictions"] = y_pred
+        dt["Predictions"] = dt["Predictions"].map(LABEL_MAPPING)
+        to_csv(fname, dt)
 
 
 if __name__ == "__main__":
