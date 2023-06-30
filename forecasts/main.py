@@ -4,7 +4,7 @@ import mlflow
 import numpy as np
 import skorch
 from imblearn.under_sampling import RandomUnderSampler
-from joblib import load
+from joblib import dump, load
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 
@@ -83,10 +83,10 @@ def train_split(X, y, X_valid, y_valid):
 def main():
     scaler = MinMaxScaler()
     with timer("Learn the normalization"):
-        # for file in files(subset="train"):
-        #     features, *_ = read_single(file)
-        #     scaler.partial_fit(features)
-        # dump(scaler, "data/scaler.pickle")
+        for file in files(subset="train"):
+            features, *_ = read_single(file)
+            scaler.partial_fit(features)
+        dump(scaler, "data/scaler.pickle")
         scaler = load("data/scaler.pickle")
 
     with timer("Build the train set"):
