@@ -15,7 +15,7 @@ def fake(
     start="2023-06-27 06:06:00",
     stop="2023-06-27 10:02:00",
 ) -> pd.DataFrame:
-    datetime_range = pd.date_range(start=start, end=stop, freq="30L")
+    datetime_range = pd.date_range(start=start, end=stop, freq="30m")
     # Create a DataFrame with the datetime column
     df = pd.DataFrame({"Date_time": datetime_range})
     df["idx"] = df.index
@@ -46,5 +46,6 @@ def dataset(tmp_path: pathlib.Path) -> pathlib.Path:
     datadir = tmp_path / "data"
     datadir.mkdir(exist_ok=True)
     df = fake()
-    df.to_csv(datadir / "data_0.csv", index=False, header=None)
+    for i in range(7):
+        df.to_csv(datadir / f"data_{i}.csv", index=False, header=None)
     return datadir
