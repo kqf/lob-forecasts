@@ -2,8 +2,6 @@ from forecasts.data import files
 
 
 def test_data(dataset):
-    for file in files(directory=dataset):
-        print(file)
-
-    print("d")
+    filename = next(iter(files("train", directory=dataset)))
+    print(filename)
     print(dataset)

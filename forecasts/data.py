@@ -105,6 +105,7 @@ def files(
     path = Path(directory)
     # Sort the files by date
     files = sorted(path.glob("*.csv"), key=lambda x: x.stem.split("_")[1])
+    print(files)
     sets = {
         "train": files[: -n_test - n_valid],
         "valid": files[-n_test - n_valid : -n_test],
