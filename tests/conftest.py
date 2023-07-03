@@ -12,10 +12,10 @@ def legacy_fake(path):
 
 
 def fake(
-    start="2023-06-27 06:06:00",
-    stop="2023-06-27 10:02:00",
+    start="2023-05-27 06:06:00",
+    stop="2023-06-27 11:02:00",
 ) -> pd.DataFrame:
-    datetime_range = pd.date_range(start=start, end=stop, freq="30m")
+    datetime_range = pd.date_range(start=start, end=stop, freq="10Min")
     # Create a DataFrame with the datetime column
     df = pd.DataFrame({"Date_time": datetime_range})
     df["idx"] = df.index
@@ -27,7 +27,8 @@ def fake(
 
     for c in FEATURES:
         df[c] = np.random.rand(*df.index.values.shape)
-    return df
+    df["Date_time"] = df["Date_time"].dt.strftime("%Y%m%d-%H:%M:%S.%f")
+    return df[COLUMNS]
 
 
 @pytest.fixture
@@ -45,7 +46,7 @@ def fake_dataset(tmp_path: pathlib.Path) -> pathlib.Path:
 def dataset(tmp_path: pathlib.Path) -> pathlib.Path:
     datadir = tmp_path / "data"
     datadir.mkdir(exist_ok=True)
-    df = fake()
     for i in range(7):
+        df = fake()
         df.to_csv(datadir / f"data_{i}.csv", index=False, header=None)
     return datadir
