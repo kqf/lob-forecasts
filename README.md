@@ -1,4 +1,4 @@
-# LOB forecasts
+# LOB forecasts [![tests](https://github.com/kqf/lob-forecasts/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/kqf/lob-forecasts/actions/workflows/tests.yml)
 
 ## Installation
 One needs a fresh virtual env for python, then do:
